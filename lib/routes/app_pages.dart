@@ -1,14 +1,17 @@
 import 'package:final_project/bindings/auth_binding.dart';
 import 'package:final_project/bindings/cart_binding.dart';
 import 'package:final_project/bindings/checkout_binding.dart';
+import 'package:final_project/bindings/checkout_info_binding.dart';
 import 'package:final_project/bindings/home_page_bindding.dart';
 import 'package:final_project/bindings/product_detail_binding.dart';
 import 'package:final_project/pages/CheckOutPage.dart';
+import 'package:final_project/pages/CheckoutInfo.dart';
 import 'package:final_project/pages/EnterCodePage.dart';
 import 'package:final_project/pages/ForgotPasswordPage.dart';
 import 'package:final_project/pages/ProductDetail.dart';
 import 'package:final_project/pages/RegisterPage.dart';
 import 'package:final_project/pages/ResetPasswordPage.dart';
+import 'package:final_project/pages/ThankYouPage.dart';
 import 'package:get/get.dart';
 import 'package:final_project/bindings/dashboard_binding.dart';
 import 'package:final_project/pages/DashBoardPage.dart';
@@ -84,6 +87,14 @@ class AppPages {
       name: AppRoutes.CHECKOUT,
       page: () => CheckoutPage(),
       binding: CheckoutBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.CHECKOUT_INFO,
+      page: () => CheckoutInfoPage(),
+      binding: CheckoutInfoBinding(),
+    ), GetPage(
+      name: AppRoutes.ORDER_SUCCESS,
+      page: () => ThankYouPage(),
     ),
   ];
 }

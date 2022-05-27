@@ -1,11 +1,14 @@
 import 'package:final_project/controllers/auth_controller.dart';
+import 'package:final_project/controllers/checkout_controller.dart';
 import 'package:final_project/controllers/filter_controller.dart';
 import 'package:final_project/controllers/home_page_controller.dart';
 import 'package:final_project/controllers/my_order_controller.dart';
 import 'package:final_project/controllers/product_detail_controller.dart';
 import 'package:final_project/controllers/shop_page_controller.dart';
 import 'package:final_project/pages/HomePage.dart';
+import 'package:final_project/provider/address_info_provider.dart';
 import 'package:final_project/provider/auth_provider.dart';
+import 'package:final_project/provider/ghn_provider.dart';
 import 'package:final_project/provider/my_order_provider.dart';
 import 'package:final_project/provider/product_provider.dart';
 import 'package:final_project/provider/user_provider.dart';
@@ -32,9 +35,14 @@ void main() async {
   Get.lazyPut<ShopPageController>(() => ShopPageController());
   Get.lazyPut<AuthProvider>(() => AuthProvider());
   Get.lazyPut(() => MyOrderProvider());
-  Get.lazyPut(()=>FilterController());
+  Get.lazyPut(() => FilterController());
+  Get.lazyPut(() => CheckoutController());
+  Get.lazyPut(()=>GHNProvider());
+  Get.lazyPut(()=>AddressInfoProvider());
 
-
+  Get.put(AddressInfoProvider());
+  Get.put(GHNProvider());
+  Get.put(CheckoutController());
   Get.put(MyOrderController());
   Get.put(FilterController());
   Get.put(AuthController());

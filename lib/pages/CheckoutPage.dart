@@ -1,3 +1,4 @@
+import 'package:final_project/controllers/user_controller.dart';
 import 'package:final_project/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/controllers/cart_controller.dart';
@@ -18,6 +19,8 @@ import '../components/BillDetaiItem.dart';
 class CheckoutPage extends GetView<CheckoutController> {
   final CartController cartController = Get.find();
   final CheckoutInfoController checkoutInfoController = Get.find();
+  final UserController userController = Get.find();
+
   CheckoutPage({Key? key}) : super(key: key);
   final indexOfList = 0.obs;
   @override
@@ -39,7 +42,7 @@ class CheckoutPage extends GetView<CheckoutController> {
               Expanded(
                   child: ListView(
                 shrinkWrap: true,
-                children: [ showListBillDetail(),addressInfo(), orderMethod()],
+                children: [showListBillDetail(), addressInfo(), orderMethod()],
               )),
               createOrder()
             ])));
@@ -90,6 +93,7 @@ class CheckoutPage extends GetView<CheckoutController> {
                           );
                         },
                       ),
+
                     ])),
               ));
         },
@@ -98,7 +102,7 @@ class CheckoutPage extends GetView<CheckoutController> {
 
   Widget showAddressInfo() {
     return Obx(() {
-      if(controller.isLoading.value){
+      if (controller.isLoading.value) {
         return const CircularProgressIndicator();
       }
       if (controller.addressInfos.isNotEmpty) {
@@ -160,16 +164,21 @@ class CheckoutPage extends GetView<CheckoutController> {
                   height: 12,
                 ),
                 showAddressInfo(),
-                // TextButton(
-                //     onPressed: () async {
-                //       await checkoutInfoController.changeAddressInfo(
-                //           AddressInfo(
-                //               district: District(),
-                //               province: District(),
-                //               ward: Ward()));
-                //       Get.toNamed(AppRoutes.CHECKOUT_INFO);
-                //     },
-                //     child: const Text('Thêm địa chỉ nhận hàng')),
+                Obx((){
+                  if(!controller.addressInfos.isNotEmpty){
+                    return TextButton(
+                        onPressed: () async {
+                          await checkoutInfoController.changeAddressInfo(
+                              AddressInfo(
+                                  district: District(),
+                                  province: District(),
+                                  ward: Ward()));
+                          Get.toNamed(AppRoutes.CHECKOUT_INFO);
+                        },
+                        child: const Text('Thêm địa chỉ nhận hàng'));
+                  }
+                  return Container();
+                })
               ],
             )));
   }
@@ -265,7 +274,7 @@ class CheckoutPage extends GetView<CheckoutController> {
         return ElevatedButton(
             onPressed: () {
               controller.createOrder(controller.addressInfos[indexOfList.value],
-                  cartController.carts, cartController.total.value);
+                  cartController.carts, cartController.total.value, cartController.clearCart);
             },
             child: const Text('Thanh toán'));
       }

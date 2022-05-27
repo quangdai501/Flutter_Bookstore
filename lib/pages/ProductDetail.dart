@@ -289,7 +289,7 @@ class ProductDetail extends GetView<ProductDetailController> {
     return Obx(() {
       if (userController.isLogin.value) {
         return ElevatedButton(
-          onPressed: () => openFilter(),
+          onPressed: () => openCommentModal(),
           child: const Text('Thêm bình luận'),
         );
       }
@@ -299,7 +299,28 @@ class ProductDetail extends GetView<ProductDetailController> {
     });
   }
 
-  openFilter() {
+  Widget ratingBar() {
+    return Obx(() => Wrap(
+          direction: Axis.horizontal,
+          children: List.generate(5, (i) => i)
+              .map(
+                (i) => IconButton(
+                  onPressed: () {
+                    controller.rating.value = i + 1;
+                  },
+                  icon: Icon(
+                    Icons.star,
+                    color: (i + 1 <= controller.rating.value
+                        ? Colors.yellow
+                        : Colors.grey),
+                  ),
+                ),
+              )
+              .toList(),
+        ));
+  }
+
+  openCommentModal() {
     Get.bottomSheet(
       ReactiveForm(
           formGroup: fb.group({
@@ -310,10 +331,10 @@ class ProductDetail extends GetView<ProductDetailController> {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(10),
                   child: Column(children: [
                     const Text(
-                      "Mô tả sản phẩm",
+                      "Thêm đánh giá",
                       style: TextStyle(
                         fontSize: 16,
                       ),
@@ -330,15 +351,16 @@ class ProductDetail extends GetView<ProductDetailController> {
                         const SizedBox(
                           width: 12,
                         ),
-                        Obx(() => GFRating(
-                            allowHalfRating: false,
-                            color: Colors.yellow,
-                            borderColor: Colors.yellow,
-                            size: 25,
-                            onChanged: (val) {
-                              controller.rating.value = val as int;
-                            },
-                            value: controller.rating.value.toDouble()))
+                        ratingBar()
+                        // Obx(() => GFRating(
+                        //     allowHalfRating: false,
+                        //     color: Colors.yellow,
+                        //     borderColor: Colors.yellow,
+                        //     size: 25,
+                        //     onChanged: (val) {
+                        //       controller.rating.value = val as int;
+                        //     },
+                        //     value: controller.rating.value.toDouble()))
                       ],
                     ),
                     ReactiveTextField<String>(
@@ -352,10 +374,12 @@ class ProductDetail extends GetView<ProductDetailController> {
                     ),
                     ReactiveFormConsumer(
                       builder: (context, form, child) => ElevatedButton(
-                        onPressed: form.valid
-                            ? () =>
-                                {controller.createReview(form.value["comment"])}
-                            : null,
+                        onPressed: () {
+                          form.valid
+                              ? controller.createReview(form.value["comment"])
+                              : null;
+                          Get.back();
+                        },
                         child: const Text('Gửi đánh giá'),
                       ),
                     ),

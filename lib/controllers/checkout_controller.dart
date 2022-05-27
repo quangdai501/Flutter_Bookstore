@@ -1,6 +1,7 @@
 import 'package:final_project/models/address_info_model.dart';
 import 'package:final_project/provider/address_info_provider.dart';
 import 'package:final_project/provider/my_order_provider.dart';
+import 'package:final_project/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 import '../models/cart_model.dart';
@@ -13,7 +14,7 @@ class CheckoutController extends GetxController {
   MyOrderProvider myOrderProvider = Get.find();
   final shippingFee = 15000.obs;
   final addressInfos = <AddressInfo>[].obs;
-final isLoading = false.obs;
+  final isLoading = false.obs;
   @override
   void onInit() {
     super.onInit();
@@ -69,11 +70,8 @@ final isLoading = false.obs;
     catch (ex) {}
   }
 
-  createOrder(
-    AddressInfo addressInfo,
-    List<Cart> carts,
-    var total,
-  ) async {
+  createOrder(AddressInfo addressInfo, List<Cart> carts, var total,
+      Function clearCart) async {
     try {
       Address address = Address(
           toWardCode: addressInfo.ward.id,
@@ -96,13 +94,14 @@ final isLoading = false.obs;
       // return order;
       await myOrderProvider.createOrder(order);
       Get.snackbar('Đặt hàng', 'Đặt hàng thành công');
+      clearCart();
 
       await myOrderProvider.sendMail({
         "userInfo": {"name": addressInfo.name},
-        "cartItems": cartToJson(carts)
+        "cartItems": carts
       });
-      await Future.delayed(const Duration(seconds: 1));
       Get.snackbar('Đặt hàng', 'Chúng tôi vừa gửi mail tới bạn');
+      Get.offNamed(AppRoutes.ORDER_SUCCESS);
     }
     // ignore: empty_catches
     catch (ex) {
