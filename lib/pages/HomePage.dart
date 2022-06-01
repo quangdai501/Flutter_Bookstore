@@ -1,13 +1,18 @@
+import 'dart:async';
+
 import 'package:final_project/components/ProductItem.dart';
 import 'package:final_project/controllers/dashboard_controller.dart';
 import 'package:final_project/controllers/home_page_controller.dart';
+import 'package:final_project/controllers/shop_page_controller.dart';
 import 'package:final_project/models/product_model.dart';
+import 'package:final_project/routes/app_routes.dart';
 import 'package:final_project/utils/convert_currency.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/customs/CustomBorder.dart';
 import 'package:final_project/customs/CustomTextStyle.dart';
 import 'package:final_project/customs/CustomSeparateBox.dart';
 import 'package:get/get.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
 class HomePage extends GetView<HomePageController> {
   HomePage({Key? key}) : super(key: key);
@@ -17,9 +22,11 @@ class HomePage extends GetView<HomePageController> {
   List<Product> bestSellProducts = [];
   List<Product> featureProducts = [];
 
-  int selectedSliderPosition = 0;
 
   DashboardController dbController = Get.put(DashboardController());
+  ShopPageController shopPageController = Get.find();
+  final searchKey = ''.obs;
+  final selectedSliderPosition = 0.obs;
 
   void sliderImage() {
     listImage.add("assets/images/banner.jpg");
@@ -60,26 +67,39 @@ class HomePage extends GetView<HomePageController> {
                       height: height / 4,
                     ),
                     Container(
+                      height: height / 3,
                       margin:
                           const EdgeInsets.only(top: 40, right: 20, left: 20),
                       child: TextField(
                         style: const TextStyle(color: Colors.black54),
                         decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                              icon: Icon(Icons.search),
+                              onPressed: () {
+                                  shopPageController.query.update((val) {
+                                    val!.search = searchKey.value;
+                                  });
+                                  shopPageController.getInitPage();
+                                  dbController.setSearchKey(searchKey.value);
+                                  dbController.changeTabIndex(1);
+                                  // Get.toNamed(AppRoutes.CATEGORY, arguments: searchKey.value);
+                              }),
                           fillColor: Colors.white,
                           hintText: "Tìm kiếm",
                           hintStyle: const TextStyle(color: Colors.black26),
                           enabledBorder: CustomBorder.enabledBorder.copyWith(
-                              borderSide: const BorderSide(color: Colors.white),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(22))),
+                            borderSide: const BorderSide(color: Colors.white),
+                          ),
                           contentPadding: const EdgeInsets.only(
                               top: 10, left: 12, right: 12, bottom: 6),
                           border: CustomBorder.enabledBorder.copyWith(
-                              borderSide: const BorderSide(color: Colors.white),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(22))),
+                            borderSide: const BorderSide(color: Colors.white),
+                          ),
                           filled: true,
                         ),
+                        onChanged: (text) {
+                          searchKey.value = text;
+                        },
                       ),
                     ),
                     Container(
@@ -94,12 +114,32 @@ class HomePage extends GetView<HomePageController> {
                             controller: PageController(viewportFraction: .95),
                             itemCount: listImage.length,
                             onPageChanged: (position) {
+                                 selectedSliderPosition.value = position;
                               // setState(() {
-                              //    selectedSliderPosition = position;
                               //  });
                             },
                           ),
-                        ))
+                        )),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: listImage.map(
+                        (image) {
+                          //these two lines
+                          int index = listImage.indexOf(image); //are changed
+                          return Container(
+                            width: 8.0,
+                            height: 8.0,
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 2.0),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: selectedSliderPosition.value == index
+                                    ? const Color.fromRGBO(0, 0, 0, 0.9)
+                                    : const Color.fromRGBO(0, 0, 0, 0.4)),
+                          );
+                        },
+                      ).toList(),
+                    )
                   ],
                 ),
                 GestureDetector(

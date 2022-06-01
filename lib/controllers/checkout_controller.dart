@@ -92,20 +92,25 @@ class CheckoutController extends GetxController {
               phone: addressInfo.phone)
           .toJson();
       // return order;
-      await myOrderProvider.createOrder(order);
-      Get.snackbar('Đặt hàng', 'Đặt hàng thành công');
-      clearCart();
-
-      await myOrderProvider.sendMail({
-        "userInfo": {"name": addressInfo.name},
-        "cartItems": carts
-      });
-      Get.snackbar('Đặt hàng', 'Chúng tôi vừa gửi mail tới bạn');
-      Get.offNamed(AppRoutes.ORDER_SUCCESS);
+      bool isOrderSuccess = await myOrderProvider.createOrder(order);
+      if (isOrderSuccess) {
+        Get.snackbar('Đặt hàng', 'Đặt hành thành công');
+        bool isSendMail = await myOrderProvider.sendMail({
+          "userInfo": {"name": addressInfo.name},
+          "cartItems": carts
+        });
+        clearCart();
+        if (isSendMail) {
+          Get.snackbar('Đặt hàng', 'Chúng tôi vừa gửi mail tới bạn');
+        }
+        Get.offNamed(AppRoutes.ORDER_SUCCESS);
+      } else {
+        Get.snackbar('Đặt hàng', 'Đặt hàng thấy bại');
+      }
     }
     // ignore: empty_catches
     catch (ex) {
-      Get.snackbar('Đặt hàng', 'Đặt hàng thất bại');
+      Get.snackbar('Đặt hàng', ex.toString());
     }
   }
 }
