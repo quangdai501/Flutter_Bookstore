@@ -3,10 +3,11 @@ import 'package:get_storage/get_storage.dart';
 
 class DashboardController extends GetxController {
   var tabIndex = 0;
+  final idx = 0.obs;
   final box = GetStorage();
 
   void changeTabIndex(int index) {
-    print(index);
+    idx.value = index;
     tabIndex = index;
     update();
   }
@@ -19,6 +20,7 @@ class DashboardController extends GetxController {
 
   String getSearchKey() {
     var key = box.read("searchKey");
+    if(key == null) return '';
     return key;
   }
 }

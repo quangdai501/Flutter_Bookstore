@@ -22,7 +22,6 @@ class HomePage extends GetView<HomePageController> {
   List<Product> bestSellProducts = [];
   List<Product> featureProducts = [];
 
-
   DashboardController dbController = Get.put(DashboardController());
   ShopPageController shopPageController = Get.find();
   final searchKey = ''.obs;
@@ -76,13 +75,13 @@ class HomePage extends GetView<HomePageController> {
                           suffixIcon: IconButton(
                               icon: Icon(Icons.search),
                               onPressed: () {
-                                  shopPageController.query.update((val) {
-                                    val!.search = searchKey.value;
-                                  });
-                                  shopPageController.getInitPage();
-                                  dbController.setSearchKey(searchKey.value);
-                                  dbController.changeTabIndex(1);
-                                  // Get.toNamed(AppRoutes.CATEGORY, arguments: searchKey.value);
+                                shopPageController.query.update((val) {
+                                  val!.search = searchKey.value;
+                                });
+                                shopPageController.getInitPage();
+                                dbController.setSearchKey(searchKey.value);
+                                dbController.changeTabIndex(1);
+                                // Get.toNamed(AppRoutes.CATEGORY, arguments: searchKey.value);
                               }),
                           fillColor: Colors.white,
                           hintText: "Tìm kiếm",
@@ -114,32 +113,31 @@ class HomePage extends GetView<HomePageController> {
                             controller: PageController(viewportFraction: .95),
                             itemCount: listImage.length,
                             onPageChanged: (position) {
-                                 selectedSliderPosition.value = position;
-                              // setState(() {
-                              //  });
+                              dbController.idx.value = position;
                             },
                           ),
                         )),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: listImage.map(
-                        (image) {
-                          //these two lines
-                          int index = listImage.indexOf(image); //are changed
-                          return Container(
-                            width: 8.0,
-                            height: 8.0,
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 2.0),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: selectedSliderPosition.value == index
-                                    ? const Color.fromRGBO(0, 0, 0, 0.9)
-                                    : const Color.fromRGBO(0, 0, 0, 0.4)),
+                    Container(
+                        height: (height / 3) + 30,
+                        alignment: Alignment.bottomCenter,
+                        child: Obx(() {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List<Widget>.generate(listImage.length,
+                                (index) {
+                              return Container(
+                                margin: EdgeInsets.all(3),
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                    color: dbController.idx.value == index
+                                        ? Colors.black87
+                                        : Colors.black26,
+                                    shape: BoxShape.circle),
+                              );
+                            }),
                           );
-                        },
-                      ).toList(),
-                    )
+                        }))
                   ],
                 ),
                 GestureDetector(
