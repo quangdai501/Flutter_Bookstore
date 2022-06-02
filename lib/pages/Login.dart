@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class LoginPage extends GetView<AuthController> {
- const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({Key? key}) : super(key: key);
   FormGroup buildForm() => fb.group(<String, Object>{
         'email': FormControl<String>(
           validators: [Validators.required],
@@ -40,6 +40,10 @@ class LoginPage extends GetView<AuthController> {
           form: () => buildForm(),
           builder: (context, form, child) {
             return Column(children: [
+              const SizedBox(
+                height: 20,
+              ),
+               Image.asset('assets/images/logo.png', width: 200),
               const SizedBox(
                 height: 80,
               ),
@@ -85,7 +89,10 @@ class LoginPage extends GetView<AuthController> {
                     child: Obx(() {
                       if (controller.isLoading.value == true) {
                         return const SizedBox(
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,),
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 1,
+                          ),
                           height: 20.0,
                           width: 20.0,
                         );

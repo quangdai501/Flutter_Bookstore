@@ -107,8 +107,8 @@ class ShopPageController extends GetxController with StateMixin<List<Product>> {
       var data = await productProvider.getAllProduct(query.value.toJson());
       List<Product> products = productFromJson(data['product']);
       var totalPage = data['totalPages'];
-// Get.defaultDialog(data[[]]);
-      if (data.isEmpty) {
+
+      if (products.isEmpty) {
         isLoadMorePage.value = false;
         change([], status: RxStatus.empty());
         return;

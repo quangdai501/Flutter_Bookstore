@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:final_project/components/ProductItem.dart';
+import 'package:final_project/controllers/dashboard_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/controllers/shop_page_controller.dart';
 import 'package:get/get.dart';
@@ -32,6 +36,7 @@ class ShopPage extends StatefulWidget {
 class _ShopPageState extends State<ShopPage> {
   ScrollController scrollController = ScrollController();
   ShopPageController controller = Get.find();
+  DashboardController dashboardController = Get.find();
   final FilterController filterController = Get.find();
   final sortActive = (-1).obs;
   final sorts = ['Giá', "Mới nhất", "Bán chạy"];
@@ -56,6 +61,7 @@ class _ShopPageState extends State<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
+    Timer? debounce;
     return Scaffold(
         backgroundColor: Colors.grey.shade100,
         body: Stack(
@@ -64,6 +70,7 @@ class _ShopPageState extends State<ShopPage> {
             Container(
               padding: const EdgeInsets.all(10),
               child: TextField(
+                controller: TextEditingController(text: dashboardController.getSearchKey()),
                 style: const TextStyle(color: Colors.black54),
                 decoration: InputDecoration(
                   fillColor: Colors.white,
@@ -79,6 +86,15 @@ class _ShopPageState extends State<ShopPage> {
                   ),
                   filled: true,
                 ),
+                onChanged: (text) {
+                  if (debounce?.isActive ?? false) debounce?.cancel();
+                  debounce = Timer(const Duration(milliseconds: 500), () {
+                    controller.query.update((val) {
+                      val!.search = text;
+                    });
+                    controller.getInitPage();
+                  });
+                },
               ),
             ),
             Column(
@@ -228,13 +244,15 @@ class _ShopPageState extends State<ShopPage> {
       isScrollControlled: true,
     );
   }
+
   Widget priceFilter() {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
-            Text(
+            const SizedBox(height: 30),
+            const Text(
               "Giá",
               style: const TextStyle(fontSize: 18),
             ),
@@ -253,44 +271,44 @@ class _ShopPageState extends State<ShopPage> {
   Widget range(String title, RxDouble val, RxBool isSelect) {
     // final isSelect = false.obs;
     return Obx(() => Column(
-      children: [
-        Row(
           children: [
-            const SizedBox(width: 12),
-            Text(title),
-            const SizedBox(width: 12),
+            Row(
+              children: [
+                const SizedBox(width: 12),
+                Text(title),
+                const SizedBox(width: 12),
+                isSelect.value
+                    ? Text(ConvertNumberToCurrency(val.value.toInt()))
+                    : Container(),
+                Expanded(
+                    child: Align(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          icon: isSelect.value
+                              ? const Icon(Icons.arrow_drop_up)
+                              : const Icon(Icons.arrow_drop_down),
+                          onPressed: () {
+                            isSelect.value = !isSelect.value;
+                          },
+                        )))
+              ],
+            ),
+            const SizedBox(height: 12),
             isSelect.value
-                ? Text(ConvertNumberToCurrency(val.value.toInt()))
-                : Container(),
-            Expanded(
-                child: Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      icon: isSelect.value
-                          ? const Icon(Icons.arrow_drop_up)
-                          : const Icon(Icons.arrow_drop_down),
-                      onPressed: () {
-                        isSelect.value = !isSelect.value;
-                      },
-                    )))
+                ? SfSlider(
+                    min: 0,
+                    max: 1000000,
+                    value: val.value,
+                    interval: 1000000,
+                    stepSize: 10000,
+                    showLabels: true,
+                    minorTicksPerInterval: 1,
+                    onChanged: (value) {
+                      val.value = value;
+                    })
+                : Container()
           ],
-        ),
-        const SizedBox(height: 12),
-        isSelect.value
-            ? SfSlider(
-            min: 0,
-            max: 1000000,
-            value: val.value,
-            interval: 1000000,
-            stepSize: 10000,
-            showLabels: true,
-            minorTicksPerInterval: 1,
-            onChanged: (value) {
-              val.value = value;
-            })
-            : Container()
-      ],
-    ));
+        ));
   }
 
   Widget select(
@@ -333,7 +351,7 @@ class _ShopPageState extends State<ShopPage> {
   publisher() {
     return controller.publishers
         .map((publisher) =>
-        MultiSelectItem<Publisher>(publisher, publisher.name))
+            MultiSelectItem<Publisher>(publisher, publisher.name))
         .toList();
   }
 }

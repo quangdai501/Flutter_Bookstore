@@ -29,10 +29,9 @@ class MyOrderProvider extends BaseProvider {
       String url = 'orders/createOrder';
       final response = await post(url, body);
       if (response.hasError) {
-        throw response.body;
+        return false;
       }
-      var data = Order.fromJson(response.body);
-      return data;
+      return true;
     } catch (exception) {
       return Future.error(exception.toString());
     }
@@ -44,9 +43,9 @@ class MyOrderProvider extends BaseProvider {
       String url = 'orders/sendmail';
       final response = await post(url, body);
       if (response.hasError) {
-        throw response.body;
+        return false;
       }
-      return response.body;
+      return true;
     } catch (exception) {
       return Future.error(exception.toString());
     }

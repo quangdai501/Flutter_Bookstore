@@ -84,6 +84,7 @@ flutter:
       - assets/images/slider_img.webp
       - assets/images/user.png
       - assets/images/order_success.png
+      - assets/images/logo.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
